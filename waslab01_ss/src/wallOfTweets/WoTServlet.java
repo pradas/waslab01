@@ -62,7 +62,7 @@ public class WoTServlet extends HttpServlet {
 		res.setContentType ("text/html");
 		res.setCharacterEncoding(ENCODING);
 		PrintWriter  out = res.getWriter ( );
-		out.println("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
+		out.println("<!DOCTYPE html>");
 		out.println("<html>");
 		out.println("<head><title>Wall of Tweets</title>");
 		out.println("<link href=\"wallstyle.css\" rel=\"stylesheet\" type=\"text/css\" />");
