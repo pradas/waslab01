@@ -49,9 +49,9 @@ public class WoTServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		// This method does NOTHING but to show again the main page
+		// This method does NOTHING but redirect to the main page
 
-		this.doGet(request, response);
+		response.sendRedirect(request.getContextPath());
 	}
 
 	private void printHTMLresult (Vector<Tweet> tweets, HttpServletRequest req, HttpServletResponse res) throws IOException
@@ -70,9 +70,9 @@ public class WoTServlet extends HttpServlet {
 		out.println("<body class=\"wallbody\">");
 		out.println("<h1>Wall of Tweets</h1>");
 		out.println("<div class=\"walltweet\">"); 
-		out.println("<form action=\"wot\" method=\"post\">");
+		out.println("<form method=\"post\">");
 		out.println("<table border=0 cellpadding=2>");
-		out.println("<tr><td>Your name:</td><td><input name=\"author\" type=\"text\" size=70></td><td/></tr>");
+		out.println("<tr><td>Your name:</td><td><input name=\"author\" type=\"text\" size=70></td><td></td></tr>");
 		out.println("<tr><td>Your tweet:</td><td><textarea name=\"tweet_text\" rows=\"2\" cols=\"70\" wrap></textarea></td>"); 
 		out.println("<td><input type=\"submit\" name=\"action\" value=\"Tweet!\"></td></tr>"); 
 		out.println("</table></form></div>"); 
