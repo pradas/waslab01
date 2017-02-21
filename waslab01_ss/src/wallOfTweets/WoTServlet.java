@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -35,8 +36,10 @@ public class WoTServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
+			String acc = request.getHeader("Accept");
 			Vector<Tweet> tweets = Database.getTweets();
-			printHTMLresult(tweets, request, response);
+			if (acc.equals("text/plain")) printPLAINresult(tweets, request, response);
+			else printHTMLresult(tweets, request, response);
 		}
 
 		catch (SQLException ex ) {
@@ -88,5 +91,24 @@ public class WoTServlet extends HttpServlet {
 			out.println("</div>");
 		}
 		out.println ( "</body></html>" );
+	}
+	
+	private void printPLAINresult (Vector<Tweet> tweets, HttpServletRequest req, HttpServletResponse res) throws IOException
+	{
+		
+		String pattern = "EEE MMM d hh:mm:ss z yyyy";
+		
+		SimpleDateFormat formatter = new SimpleDateFormat(pattern, currentLocale);
+		
+		
+		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, currentLocale);
+		DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.DEFAULT, currentLocale);
+		res.setContentType ("text/html");
+		res.setCharacterEncoding(ENCODING);
+		PrintWriter  out = res.getWriter ( );
+		
+		for (Tweet tweet: tweets) {			
+			out.println("tweet #" + tweet.getTwid() + ": " + tweet.getAuthor() + ": "+ tweet.getText() + " ["+ formatter.format(tweet.getDate()) +"]");
+		}
 	}
 }
