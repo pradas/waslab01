@@ -51,16 +51,19 @@ public class WoTServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		try {
-			
-			Database.insertTweet(request.getParameter("author"), request.getParameter("tweet_text"));
+		
+		long idTweet = 0;
+		try {			
+			idTweet = Database.insertTweet(request.getParameter("author"), request.getParameter("tweet_text"));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		response.sendRedirect(request.getContextPath());
+		if (!request.getHeader("Accept").equals("text/plain"))
+			response.sendRedirect(request.getContextPath());
+		PrintWriter out = response.getWriter();
+		out.print(idTweet);
+		
 	}
 
 	private void printHTMLresult (Vector<Tweet> tweets, HttpServletRequest req, HttpServletResponse res) throws IOException
