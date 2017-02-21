@@ -52,7 +52,13 @@ public class WoTServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-		// This method does NOTHING but redirect to the main page
+		try {
+			
+			Database.insertTweet(request.getParameter("author"), request.getParameter("tweet_text"));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		response.sendRedirect(request.getContextPath());
 	}
@@ -99,10 +105,7 @@ public class WoTServlet extends HttpServlet {
 		String pattern = "EEE MMM d hh:mm:ss z yyyy";
 		
 		SimpleDateFormat formatter = new SimpleDateFormat(pattern, currentLocale);
-		
-		
-		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.DEFAULT, currentLocale);
-		DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.DEFAULT, currentLocale);
+				
 		res.setContentType ("text/html");
 		res.setCharacterEncoding(ENCODING);
 		PrintWriter  out = res.getWriter ( );
