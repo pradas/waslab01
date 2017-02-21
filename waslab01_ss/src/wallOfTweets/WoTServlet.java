@@ -62,8 +62,18 @@ public class WoTServlet extends HttpServlet {
 		if (!request.getHeader("Accept").equals("text/plain"))
 			response.sendRedirect(request.getContextPath());
 		PrintWriter out = response.getWriter();
-		out.print(idTweet);
+		out.print(idTweet);		
+	}
+	
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
+	{
+		long idTweet = Long.parseLong(request.getParameter("id_tweet"));
+		Database.deleteTweet(52);
 		
+		if (!request.getHeader("Accept").equals("text/plain"))
+			response.sendRedirect(request.getContextPath());
+		PrintWriter out = response.getWriter();
+		out.print(idTweet);	
 	}
 
 	private void printHTMLresult (Vector<Tweet> tweets, HttpServletRequest req, HttpServletResponse res) throws IOException
@@ -96,6 +106,12 @@ public class WoTServlet extends HttpServlet {
 			}
 			out.println("<div class=\"wallitem\">");
 			out.println("<h4><em>" + tweet.getAuthor() + "</em> @ "+ timeFormatter.format(tweet.getDate()) +"</h4>");
+			
+			out.println("<form method=\"delete\">");
+			out.println("<input type=\"hidden\" name=\"id_tweet\" value=\""+ tweet.getTwid() +"\">");
+			out.println("<input type=\"submit\" value=\" Esborrar Tweet\">");
+			out.println("</form>");
+
 			out.println("<p>" + tweet.getText() + "</p>");
 			out.println("</div>");
 		}
