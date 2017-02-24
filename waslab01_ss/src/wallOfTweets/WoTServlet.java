@@ -2,6 +2,8 @@ package wallOfTweets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -10,6 +12,7 @@ import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,43 +49,57 @@ public class WoTServlet extends HttpServlet {
 			throw new ServletException(ex);
 		}
 	}
+	
+	private String MD5(String md5) {
+		   try {
+		        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+		        byte[] array = md.digest(md5.getBytes());
+		        StringBuffer sb = new StringBuffer();
+		        for (int i = 0; i < array.length; ++i) {
+		          sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+		       }
+		        return sb.toString();
+		    } catch (java.security.NoSuchAlgorithmException e) {
+		    }
+		    return null;
+		}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		long idTweet = 0;
 		try {	
 			if (request.getParameter("id_tweet") == null) {
-				idTweet = Database.insertTweet(request.getParameter("author"), request.getParameter("tweet_text"));
+				long idTweetNew = Database.insertTweet(request.getParameter("author"), request.getParameter("tweet_text"));				
+				SecureRandom random = new SecureRandom();
+				String nomCookie = new BigInteger(130, random).toString(32);
+				String contentCookie = MD5(String.valueOf(idTweetNew));					
+				Cookie c = new Cookie (nomCookie, contentCookie);				
+				response.addCookie(c);				
 			}
-			else {
-				long idTweetBorrat = Long.parseLong(request.getParameter("id_tweet"));
-				Database.deleteTweet(idTweetBorrat);
+			else {				
+				if (request.getCookies() != null) {
+				
+					Cookie [] c = request.getCookies();
+				
+					long idTweetBorrat = Long.parseLong(request.getParameter("id_tweet"));
+					String contentCookie = MD5(String.valueOf(idTweetBorrat));	
+					
+				
+					for (Cookie cc: c) {										
+						if (cc.getValue().equals(contentCookie)) Database.deleteTweet(idTweetBorrat);
+					}					
+				}			
 			}			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if (!request.getHeader("Accept").equals("text/plain"))
-			response.sendRedirect(request.getContextPath());
-		PrintWriter out = response.getWriter();
-		out.print(idTweet);		
+			response.sendRedirect(request.getContextPath());		
 	}
 	
-	/*
-	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException 
-	{
-		long idTweet = Long.parseLong(request.getParameter("id_tweet"));
-		Database.deleteTweet(52);
-		
-		if (!request.getHeader("Accept").equals("text/plain"))
-			response.sendRedirect(request.getContextPath());
-		PrintWriter out = response.getWriter();
-		out.print(idTweet);	
-	}*/
-
 	private void printHTMLresult (Vector<Tweet> tweets, HttpServletRequest req, HttpServletResponse res) throws IOException
 	{
 		DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.FULL, currentLocale);
@@ -135,6 +152,8 @@ public class WoTServlet extends HttpServlet {
 		res.setContentType ("text/html");
 		res.setCharacterEncoding(ENCODING);
 		PrintWriter  out = res.getWriter ( );
+		
+		out.println(tweets.get(0).getTwid());
 		
 		for (Tweet tweet: tweets) {			
 			out.println("tweet #" + tweet.getTwid() + ": " + tweet.getAuthor() + ": "+ tweet.getText() + " ["+ formatter.format(tweet.getDate()) +"]");
